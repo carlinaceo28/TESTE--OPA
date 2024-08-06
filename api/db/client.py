@@ -7,7 +7,7 @@ from user import user
 
 
 def hello():
-    x=user("Carlos",12)
+    x=user("maria")
     y=json.dumps(x.__dict__)
     print(y)
     
@@ -17,3 +17,8 @@ def hello():
         message = websocket.recv()
         print(f"Received: {message}")
 hello()
+
+async def main():
+            
+                    await asyncio.Future()  # run forever
+asyncio.run(main())

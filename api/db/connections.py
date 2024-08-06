@@ -38,10 +38,8 @@ class db_connector:
                 self.connect()
                 z=json.loads(user)
                 
-                #comando = "INSERT INTO users (id ,name) 
-                #VALUES ({z["cpf"]},{z["name"]})"({z["cpf"]},{z["name"]})
 
-                comando = "INSERT INTO users (id ,name) VALUES (%d,'%s')  " % (z["id"], z["nome"])
+                comando = "INSERT INTO users (name) VALUES ('%s')  " % ( z["nome"])
                 print (comando)
 
                 print("adicionado na tabela")
@@ -49,6 +47,13 @@ class db_connector:
 
                 
                 self.disconnect()
+
+
+
+                #comando = "INSERT INTO users (id ,name) 
+                #VALUES ({z["cpf"]},{z["name"]})"({z["cpf"]},{z["name"]})
+
+
 #mydb = MySQLdb.connect(host=host, user=user, passwd=passwd, db=database, charset="utf8")
 #cursor = mydb.cursor()
 #query = "INSERT INTO tablename (text_for_field1, text_for_field2, text_for_field3, text_for_field4) VALUES (%s, %s, %s, %s)"
