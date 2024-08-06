@@ -13,7 +13,9 @@ class db_server:
             async def echo(websocket):
                 async for message in websocket:
                     print(message) #comando para mandar p/ o banco.sql
+                    #if message for user add no banco via websocket
                     self.db.add_user(message)
+                    #if message for um N devolver fibonacci
                     await websocket.send(message)
 
         
@@ -24,3 +26,17 @@ class db_server:
 
   
 
+
+#função que retorna a sequência de Fibonacci até o enésimo termo (n).
+    def fibonacci(n):
+        if n <= 0:
+            return "O número deve ser maior que zero."
+        elif n == 1:
+            return [0]
+        elif n == 2:
+            return [0, 1]
+        else:
+         seq = [0, 1]
+        while len(seq) < n:
+            seq.append(seq[-1] + seq[-2])
+        return seq
