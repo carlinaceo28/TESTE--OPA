@@ -10,24 +10,32 @@ class db_server:
     def __init__(self,port):
         self.db = db_connector()
         self.port = port
-        self.websockets = []
+        self.connected = []
         
     def run_server(self):
-            async def echo(websocket):
+            async def handler(websocket):
+               await asyncio.gather(registrar_nome(websocket),Enviar_timer(websocket))
+
+            async def registrar_nome(websocket):
                 async for message in websocket:
                     print(message) #comando para mandar p/ o banco.sql
                     #if message for user add no banco via websocket
                     self.db.add_user(message)
                     #if message for um N devolver fibonacci
-                    if (websocket not in self.websockets):
-                        self.websockets.append(websocket)
-                    for ws in self.websockets:
-                        await ws.send(message)
+                    if (websocket not in self.connected):
+                        self.connected.append(websocket)
+                    websockets.broadcast(self.connected,message)    
+            
+            async def Enviar_timer(websocket):     
+               while(True):
+                hour= datetime.now().isoformat(" ","seconds")
+                await websocket.send(hour)
+                await asyncio.sleep(1)
 
-                    
             async def main():
-                async with serve(echo, "localhost", self.port):
+                async with serve(handler, "localhost", self.port):    
                     await asyncio.Future()  # run forever
+             
             asyncio.run(main())
 
   
