@@ -3,11 +3,14 @@ from websockets.server import serve
 from websockets.sync.client import connect
 import websockets
 from db.connections import db_connector
+from datetime import datetime
+
 
 class db_server:
     def __init__(self,port):
         self.db = db_connector()
         self.port = port
+        self.websockets = []
         
     def run_server(self):
             async def echo(websocket):
@@ -16,9 +19,12 @@ class db_server:
                     #if message for user add no banco via websocket
                     self.db.add_user(message)
                     #if message for um N devolver fibonacci
-                    await websocket.send(message)
+                    if (websocket not in self.websockets):
+                        self.websockets.append(websocket)
+                    for ws in self.websockets:
+                        await ws.send(message)
 
-        
+                    
             async def main():
                 async with serve(echo, "localhost", self.port):
                     await asyncio.Future()  # run forever

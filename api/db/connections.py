@@ -13,9 +13,8 @@ class db_connector:
                 if self.connection.is_connected():
     
                         print("Conectado ao MySQL Serve ")
-                        self.cursor = self.connection.cursor()
-                        self.cursor.execute("select database();")
-                        record = self.cursor.fetchone()
+                        self.cursor = self.connection.cursor(buffered=True)
+                        
                 
         def disconnect(self):
                 self.connection.commit()
@@ -25,25 +24,33 @@ class db_connector:
      
         def __init__(self):
                 self.connect()
-                # Criar a tabela de usuários conectados, se não existir
-                self.cursor.execute('''CREATE TABLE IF NOT EXISTS users (
+                # Apaga a tabela de usuários, se existir
+                self.cursor.execute('''DROP TABLE IF EXISTS users;''')   
+
+                # Criar a tabela de usuários conectados
+                self.cursor.execute('''CREATE TABLE users (
                         id int AUTO_INCREMENT PRIMARY KEY,
-                        name VARCHAR(255) NOT NULL)''')        
+                        name VARCHAR(255) UNIQUE NOT NULL)''')        
                 self.disconnect()
         def __del__(self):
                 self.connection.close()
                 self.cursor.close()
         
-        def add_user (self,user):
+        def add_user (self,username):
                 self.connect()
-                z=json.loads(user)
                 
-
-                comando = "INSERT INTO users (name) VALUES ('%s')  " % ( z["nome"])
+                #local pra usar o if p/ perguntar se o nome (unique) já existe e caso não, criar
+                comando = "SELECT count(*) from users Where name = (%s); "
+                self.cursor.execute(comando, [username])
+                qtd_users = self.cursor.fetchone()[0]
+                if (qtd_users != 0):
+                         return
+                
+                comando = "INSERT INTO users (name) VALUES (%s);  "
                 print (comando)
 
-                print("adicionado na tabela")
-                self.cursor.execute(comando)
+                print("adicionando na tabela")
+                self.cursor.execute(comando, [username])
 
                 
                 self.disconnect()
