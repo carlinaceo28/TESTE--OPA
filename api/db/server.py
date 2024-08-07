@@ -42,7 +42,7 @@ class db_server:
                     #if message for um N devolver fibonacci
                     if (websocket not in self.connected):
                         self.connected.append(websocket)
-                    websockets.broadcast(self.connected,message)    
+                    #websockets.broadcast(self.connected,message)    
             
             async def Enviar_timer(websocket):     
                while(True):

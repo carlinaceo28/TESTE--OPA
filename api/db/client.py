@@ -1,6 +1,6 @@
 import asyncio
 from websockets.sync.client import connect
-import websockets
+import websocket
 import json
 import user
 from user import user
@@ -12,9 +12,9 @@ from datetime import datetime
 #cliente precisa receber isoladamente o retorno de fibonacci caso envie um número como requisição
 #criar um if para perguntar se o nome (unique) já existe e caso não criar no banco de dados
 
-#def keyhandler():
+#def  keyhandler():
    # while(true):
-     #      if keyboard.is_pressed:
+    #if keyboard.is_pressed:
                   
 def is_datetime(message):
 # initializing string
@@ -40,30 +40,37 @@ def is_datetime(message):
 
 
 
+async def hello(websocket):
+    
+    while(True):
+        message = websocket.recv()
+        if (not is_datetime(message)) or (keyboard.is_pressed("ctrl")) : 
+            print(f"Received: {message}")
 
 
-
-
-
-def hello():
+async def gather_handler(websocket):
+               with connect("ws://localhost:6687") as websocket:
+                    await asyncio.gather(
+                        input_handler(websocket),
+                        hello(websocket)
+                )
+               
+async def input_handler(websocket): 
     print("Para visualizar o Date_Time matenha pressionado ctrl")
     name = input("insira seu nome ")
 
     x=user(name)
     y=json.dumps(x.__dict__)
     print(y)
-    
-    with connect("ws://localhost:6687") as websocket:
-      
-        websocket.send(x.nome)
-        while(True):
-            message = websocket.recv()
-            if (not is_datetime(message)) or (keyboard.is_pressed("ctrl")) : 
-                print(f"Received: {message}")
 
-hello()
-
+    websocket.send(x.nome)
+    escrita = " "
+    while(escrita != "x"):     
+            escrita = input()    
+            if escrita == "x":
+                 continue
+            websocket.send(escrita)
 async def main():
-            
-                    await asyncio.Future()  # run forever
+    await gather_handler(websocket)        
+    #await asyncio.Future()  # run forever
 asyncio.run(main())
