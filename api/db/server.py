@@ -11,10 +11,28 @@ class db_server:
         self.db = db_connector()
         self.port = port
         self.connected = []
+
+#função que retorna a sequência de Fibonacci até o enésimo termo (n).
+    def fibonacci(n):
+        if n <= 0:
+            return "O número deve ser maior que zero."
+        elif n == 1:
+            return [0]
+        elif n == 2:
+            return [0, 1]
+        else:
+         seq = [0, 1]
+        while len(seq) < n:
+            seq.append(seq[-1] + seq[-2])
+        return seq
         
     def run_server(self):
             async def handler(websocket):
-               await asyncio.gather(registrar_nome(websocket),Enviar_timer(websocket))
+               await asyncio.gather(
+                    registrar_nome(websocket),
+                    Enviar_timer(websocket),
+                    Processar_Fibonacci(websocket)
+                )
 
             async def registrar_nome(websocket):
                 async for message in websocket:
@@ -32,6 +50,16 @@ class db_server:
                 await websocket.send(hour)
                 await asyncio.sleep(1)
 
+            async def Processar_Fibonacci(websocket):
+                async for message in websocket:
+                    try: 
+                        value = int(message)
+                        total= self.fibonacci(value)
+                        await websocket.send(total)
+                    except ValueError:
+                        await websocket.send("Envieum número para receber o fibonacci")
+
+
             async def main():
                 async with serve(handler, "localhost", self.port):    
                     await asyncio.Future()  # run forever
@@ -40,17 +68,3 @@ class db_server:
 
   
 
-
-#função que retorna a sequência de Fibonacci até o enésimo termo (n).
-    def fibonacci(n):
-        if n <= 0:
-            return "O número deve ser maior que zero."
-        elif n == 1:
-            return [0]
-        elif n == 2:
-            return [0, 1]
-        else:
-         seq = [0, 1]
-        while len(seq) < n:
-            seq.append(seq[-1] + seq[-2])
-        return seq
