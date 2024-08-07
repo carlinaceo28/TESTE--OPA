@@ -13,7 +13,7 @@ class db_server:
         self.connected = []
 
 #função que retorna a sequência de Fibonacci até o enésimo termo (n).
-    def fibonacci(n):
+    def fibonacci(self,n):
         if n <= 0:
             return "O número deve ser maior que zero."
         elif n == 1:
@@ -24,14 +24,13 @@ class db_server:
          seq = [0, 1]
         while len(seq) < n:
             seq.append(seq[-1] + seq[-2])
-        return seq
+        return seq[-1]
         
     def run_server(self):
             async def handler(websocket):
                await asyncio.gather(
-                    registrar_nome(websocket),
                     Enviar_timer(websocket),
-                    Processar_Fibonacci(websocket)
+                    Processar_Dados(websocket)
                 )
 
             async def registrar_nome(websocket):
@@ -50,14 +49,19 @@ class db_server:
                 await websocket.send(hour)
                 await asyncio.sleep(1)
 
-            async def Processar_Fibonacci(websocket):
+            def Processar_Fibonacci(number):
+                        total= self.fibonacci(number)
+                        return str(total)
+                        
+            async def Processar_Dados(websocket):
                 async for message in websocket:
                     try: 
                         value = int(message)
-                        total= self.fibonacci(value)
+                        total = Processar_Fibonacci(value)
                         await websocket.send(total)
                     except ValueError:
-                        await websocket.send("Envieum número para receber o fibonacci")
+                        registrar_nome(message)
+
 
 
             async def main():
